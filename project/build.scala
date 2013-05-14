@@ -13,10 +13,16 @@ object Builds extends sbt.Build {
     ).aggregate(core, /* no 2.9.3 liftjson, */ jsoup, tagsoup, 
       json4sJackson, json4sNative)
 
+  lazy val compileSettings = Seq(
+    scalaVersion   := "2.10.1",
+    scalacOptions ++= Seq("-language:_")
+  )
+
   def module(name: String) =
     Project(name,
             file(name.replace("-", "")),
             settings = Defaults.defaultSettings ++
+	      compileSettings ++
               Common.settings ++
               Common.testSettings)
       .dependsOn(ufcheck % "test->test")
@@ -45,7 +51,7 @@ object Builds extends sbt.Build {
     
   /** Util module for using unfiltered with scalacheck */
   lazy val ufcheck = Project(
-    "ufcheck", file("ufcheck")
+    "ufcheck", file("ufcheck"), settings = Defaults.defaultSettings ++ compileSettings
   ).dependsOn(scalacheck % "test->compile")
 
   lazy val scalacheck = RootProject(
